@@ -4,6 +4,15 @@ import superagent from "superagent";
 class App extends Component {
   state = { text: "" };
 
+  stream = new EventSource("http://localhost:4000/stream");
+
+  componentDidMount() {
+    this.stream.onmessage = function(event) {
+      //onmessage is built in
+      console.log(`event data: `, event.data); //data is inside event
+    };
+  }
+
   onChange = event => {
     this.setState({ text: event.target.value });
   };
@@ -15,6 +24,7 @@ class App extends Component {
         .post("http://localhost:4000/message")
         .send({ text: this.state.text });
       console.log(response);
+      this.reset();
     } catch (error) {
       console.log(error);
     }
