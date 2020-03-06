@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import superagent from "superagent";
+import "./App.css";
 import { connect } from "react-redux";
 
 class App extends Component {
@@ -42,15 +43,19 @@ class App extends Component {
   render() {
     const messages = this.props.messages.map(message => <p>{message}</p>);
     return (
-      <main className="bg-danger text-white">
-        <form className="bg-danger text-white" onSubmit={this.onSubmit}>
+      <main
+        className="appContainer"
+        // style={{ backgroundColor: "pink" }}
+      >
+        <form className="form" onSubmit={this.onSubmit}>
           <input
+            className="input"
             type="text"
             onChange={this.onChange}
             value={this.state.text}
           ></input>
-          <button>Send</button>
-          <button type="button" onClick={this.reset}>
+          <button className="sendButton">Send</button>
+          <button className="resetButton" type="button" onClick={this.reset}>
             Reset
           </button>
         </form>
