@@ -3,10 +3,13 @@ import superagent from "superagent";
 import "./App.css";
 import { connect } from "react-redux";
 
+const baseUrl = "http://localhost:4000";
+// const baseUrl = "https://sleepy-earth-39717.herokuapp.com";
+
 class App extends Component {
   state = { text: "" };
 
-  stream = new EventSource("https://sleepy-earth-39717.herokuapp.com/stream"); //replace this with heroku url for server
+  stream = new EventSource(`${baseUrl}/stream`); //replace this with heroku url for server
 
   componentDidMount() {
     this.stream.onmessage = event => {
@@ -27,7 +30,7 @@ class App extends Component {
     event.preventDefault();
     try {
       const response = await superagent
-        .post("https://sleepy-earth-39717.herokuapp.com/message") //for server to work
+        .post(`${baseUrl}/message`) //for server to work
         .send({ text: this.state.text });
       console.log(response);
       this.reset();
@@ -42,12 +45,16 @@ class App extends Component {
 
   render() {
     const messages = this.props.messages.map(message => <p>{message}</p>);
+    const channels = this.props.channels.map(channel => <p>{channel}</p>);
     return (
       <main
         className="appContainer"
         // style={{ backgroundColor: "pink" }}
       >
         <form className="form" onSubmit={this.onSubmit}>
+          <button className="resetButton" type="button" onClick={this.reset}>
+            Reset
+          </button>
           <input
             className="input"
             type="text"
@@ -55,18 +62,18 @@ class App extends Component {
             value={this.state.text}
           ></input>
           <button className="sendButton">Send</button>
-          <button className="resetButton" type="button" onClick={this.reset}>
-            Reset
-          </button>
         </form>
+        <h2>Messages</h2>
         {messages}
+        <h2>Channels</h2>
+        {channels}
       </main>
     );
   }
 }
 
 function mapStateToProps(state) {
-  return { messages: state.messages };
+  return { messages: state.messages, channels: state.channels };
 }
 
 export default connect(mapStateToProps)(App);
