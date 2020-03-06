@@ -5,7 +5,7 @@ import { connect } from "react-redux";
 class App extends Component {
   state = { text: "" };
 
-  stream = new EventSource("http://localhost:4000/stream");
+  stream = new EventSource("https://sleepy-earth-39717.herokuapp.com/stream"); //replace this with heroku url for server
 
   componentDidMount() {
     this.stream.onmessage = event => {
@@ -26,7 +26,7 @@ class App extends Component {
     event.preventDefault();
     try {
       const response = await superagent
-        .post("http://localhost:4000/message")
+        .post("https://sleepy-earth-39717.herokuapp.com/message") //for server to work
         .send({ text: this.state.text });
       console.log(response);
       this.reset();
@@ -40,6 +40,7 @@ class App extends Component {
   };
 
   render() {
+    const messages = this.props.messages.map(message => <p>{message}</p>);
     return (
       <main>
         <form onSubmit={this.onSubmit}>
@@ -53,6 +54,7 @@ class App extends Component {
             Reset
           </button>
         </form>
+        {messages}
       </main>
     );
   }
