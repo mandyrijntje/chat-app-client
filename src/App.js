@@ -42,8 +42,8 @@ class App extends Component {
   render() {
     const messages = this.props.messages.map(message => <p>{message}</p>);
     return (
-      <main>
-        <form onSubmit={this.onSubmit}>
+      <main className="bg-danger text-white">
+        <form className="bg-danger text-white" onSubmit={this.onSubmit}>
           <input
             type="text"
             onChange={this.onChange}
