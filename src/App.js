@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import superagent from "superagent";
+import { connect } from "react-redux";
 
 class App extends Component {
   state = { text: "" };
@@ -7,9 +8,13 @@ class App extends Component {
   stream = new EventSource("http://localhost:4000/stream");
 
   componentDidMount() {
-    this.stream.onmessage = function(event) {
+    this.stream.onmessage = event => {
       //onmessage is built in
-      console.log(`event data: `, event.data); //data is inside event
+
+      console.log(`event data: `, event.data); //data is inside event //here it connects to server actions
+      const parsed = JSON.parse(event.data); //we have to parse json to a JS object to use data!
+      console.log(`parse test:`, parsed);
+      this.props.dispatch(parsed);
     };
   }
 
@@ -52,4 +57,9 @@ class App extends Component {
     );
   }
 }
-export default App;
+
+function mapStateToProps(state) {
+  return { messages: state.messages };
+}
+
+export default connect(mapStateToProps)(App);
