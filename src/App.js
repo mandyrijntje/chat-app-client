@@ -1,79 +1,72 @@
-import React, { Component } from "react";
-import superagent from "superagent";
-import "./App.css";
-import { connect } from "react-redux";
+import React from 'react';
+import superagent from 'superagent'
+import { connect } from 'react-redux'
+import Form from './Form'
+import Messages from './Messages'
+import { Route, Link } from 'react-router-dom'
 
 const baseUrl = "http://localhost:4000";
 // const baseUrl = "https://sleepy-earth-39717.herokuapp.com";
 
-class App extends Component {
-  state = { text: "" };
+class App extends React.Component {
+  stream = new EventSource(`${baseUrl}/stream`)
 
-  stream = new EventSource(`${baseUrl}/stream`); //replace this with heroku url for server
-
-  componentDidMount() {
-    this.stream.onmessage = event => {
-      //onmessage is built in
-
-      console.log(`event data: `, event.data); //data is inside event //here it connects to server actions
-      const parsed = JSON.parse(event.data); //we have to parse json to a JS object to use data!
-      console.log(`parse test:`, parsed);
-      this.props.dispatch(parsed);
-    };
+  componentDidMount () {
+    this.stream.onmessage = (event) => {
+      const parsedJson = JSON.parse(event.data)
+      this.props.dispatch(parsedJson)
+    }
   }
 
-  onChange = event => {
-    this.setState({ text: event.target.value });
-  };
-
-  onSubmit = async event => {
-    event.preventDefault();
+  createMessage = async (val) => {
     try {
       const response = await superagent
-        .post(`${baseUrl}/message`) //for server to work
-        .send({ text: this.state.text });
-      console.log(response);
-      this.reset();
+        .post(`${baseUrl}/message`)
+        .send({ text: val })
+
+      console.log(response)
     } catch (error) {
-      console.log(error);
+      console.error(error)
     }
-  };
+  }
 
-  reset = () => {
-    this.setState({ text: "" });
-  };
+  createChannel = async (val) => {
+    try {
+      const response = await superagent
+        .post(`${baseUrl}/channel`)
+        .send({ name: val })
 
-  render() {
-    const messages = this.props.messages.map(message => <p>{message}</p>);
-    const channels = this.props.channels.map(channel => <p>{channel}</p>);
-    return (
-      <main
-        className="appContainer"
-        // style={{ backgroundColor: "pink" }}
-      >
-        <form className="form" onSubmit={this.onSubmit}>
-          <button className="resetButton" type="button" onClick={this.reset}>
-            Reset
-          </button>
-          <input
-            className="input"
-            type="text"
-            onChange={this.onChange}
-            value={this.state.text}
-          ></input>
-          <button className="sendButton">Send</button>
-        </form>
-        <h2>Messages</h2>
-        {messages}
-        <h2>Channels</h2>
-        {channels}
-      </main>
-    );
+      console.log(response)
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  render () {
+    const channels = this
+      .props
+      .channels
+      .map(channel => <div>
+        <Link to={`/messages/${channel}`}>{channel}</Link>
+      </div>)
+
+    return <main>
+      <h3>Channels</h3>
+      <Form onSubmit={this.createChannel} />
+      {channels}
+
+      <Route path='/messages/:channel' component={Messages}/>
+    </main>
   }
 }
 
-function mapStateToProps(state) {
-  return { messages: state.messages, channels: state.channels };
+function mapStateToProps (state) {
+  return {
+    channels: state.channels
+  }
 }
 
-export default connect(mapStateToProps)(App);
+
+const connector = connect(mapStateToProps)
+const connected = connector(App)
+export default connected
