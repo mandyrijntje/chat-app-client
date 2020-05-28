@@ -22,10 +22,7 @@ Different channels you can chat in! What more do you need?
   - ^12.16.1
 - Express version
   - ^4.17.1
-- Sequelize version
-  - ^5.21.5
-- PostgresQL version
-  - ^7.18.2
+
 
 ## Installation
 
